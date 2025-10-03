@@ -5,10 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Sparkles, Plus, TrendingUp, BarChart3, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { CampaignWizard } from "@/components/CampaignWizard";
+import type { Database } from "@/integrations/supabase/types";
+
+type Campaign = Database['public']['Tables']['campaigns']['Row'];
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [showWizard, setShowWizard] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -21,6 +27,7 @@ const Dashboard = () => {
         return;
       }
       setUser(session.user);
+      loadCampaigns(session.user.id);
       setLoading(false);
     };
 
@@ -32,11 +39,38 @@ const Dashboard = () => {
         navigate("/auth");
       } else if (session) {
         setUser(session.user);
+        loadCampaigns(session.user.id);
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const loadCampaigns = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setCampaigns(data || []);
+    } catch (error) {
+      console.error("Error loading campaigns:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load campaigns",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleWizardSuccess = () => {
+    if (user) {
+      loadCampaigns(user.id);
+    }
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -95,7 +129,10 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <Card className="p-6 card-lift cursor-pointer hover:border-primary/30 transition-colors">
+          <Card 
+            className="p-6 card-lift cursor-pointer hover:border-primary/30 transition-colors"
+            onClick={() => setShowWizard(true)}
+          >
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                 <Plus className="w-6 h-6 text-primary" />
@@ -105,7 +142,13 @@ const Dashboard = () => {
                 <p className="text-sm text-muted-foreground font-body">Create with AI</p>
               </div>
             </div>
-            <Button className="w-full btn-press bg-primary hover:bg-primary/90 text-primary-foreground font-heading">
+            <Button 
+              className="w-full btn-press bg-primary hover:bg-primary/90 text-primary-foreground font-heading"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowWizard(true);
+              }}
+            >
               Get Started
             </Button>
           </Card>
@@ -123,11 +166,15 @@ const Dashboard = () => {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground font-body">Clicks</span>
-                <span className="font-heading font-semibold">-</span>
+                <span className="font-heading font-semibold">
+                  {campaigns.reduce((sum, c) => sum + ((c.metrics as any)?.clicks || 0), 0)}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground font-body">Impressions</span>
-                <span className="font-heading font-semibold">-</span>
+                <span className="font-heading font-semibold">
+                  {campaigns.reduce((sum, c) => sum + ((c.metrics as any)?.impressions || 0), 0)}
+                </span>
               </div>
             </div>
           </Card>
@@ -142,30 +189,100 @@ const Dashboard = () => {
                 <p className="text-sm text-muted-foreground font-body">Currently running</p>
               </div>
             </div>
-            <div className="text-3xl font-heading font-bold text-primary">0</div>
+            <div className="text-3xl font-heading font-bold text-primary">
+              {campaigns.filter(c => c.status === 'active').length}
+            </div>
           </Card>
         </div>
 
-        {/* Empty State */}
-        <Card className="p-12 text-center">
-          <div className="max-w-md mx-auto">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-              <Sparkles className="w-8 h-8 text-primary animate-sparkle" />
+        {/* Campaigns List or Empty State */}
+        {campaigns.length === 0 ? (
+          <Card className="p-12 text-center">
+            <div className="max-w-md mx-auto">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                <Sparkles className="w-8 h-8 text-primary animate-sparkle" />
+              </div>
+              <h2 className="text-2xl font-heading font-bold mb-3">
+                No campaigns yet
+              </h2>
+              <p className="text-muted-foreground mb-6 font-body">
+                Create your first AI-powered Google Ads campaign in just 5 minutes.
+                Our AI will handle everything from keywords to ad copy.
+              </p>
+              <Button 
+                className="btn-press bg-primary hover:bg-primary/90 text-primary-foreground font-heading font-semibold"
+                onClick={() => setShowWizard(true)}
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Create Your First Campaign
+              </Button>
             </div>
-            <h2 className="text-2xl font-heading font-bold mb-3">
-              No campaigns yet
-            </h2>
-            <p className="text-muted-foreground mb-6 font-body">
-              Create your first AI-powered Google Ads campaign in just 5 minutes.
-              Our AI will handle everything from keywords to ad copy.
-            </p>
-            <Button className="btn-press bg-primary hover:bg-primary/90 text-primary-foreground font-heading font-semibold">
-              <Plus className="w-5 h-5 mr-2" />
-              Create Your First Campaign
-            </Button>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-heading font-bold">Your Campaigns</h2>
+            <div className="grid gap-4">
+              {campaigns.map((campaign) => (
+                <Card key={campaign.id} className="p-6 card-lift">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-heading font-bold mb-1">
+                        {campaign.name}
+                      </h3>
+                      <p className="text-sm text-muted-foreground font-body">
+                        {campaign.description}
+                      </p>
+                    </div>
+                    <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      campaign.status === 'active' 
+                        ? 'bg-green-500/10 text-green-500' 
+                        : campaign.status === 'paused'
+                        ? 'bg-yellow-500/10 text-yellow-500'
+                        : 'bg-muted text-muted-foreground'
+                    }`}>
+                      {campaign.status}
+                    </div>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <span className="text-muted-foreground font-body">Daily Budget</span>
+                      <p className="font-heading font-semibold mt-1">
+                        ${campaign.budget_daily?.toFixed(2) || '0.00'}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground font-body">Impressions</span>
+                      <p className="font-heading font-semibold mt-1">
+                        {(campaign.metrics as any)?.impressions || 0}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground font-body">Clicks</span>
+                      <p className="font-heading font-semibold mt-1">
+                        {(campaign.metrics as any)?.clicks || 0}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground font-body">Keywords</span>
+                      <p className="font-heading font-semibold mt-1">
+                        {campaign.keywords?.length || 0}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
           </div>
-        </Card>
+        )}
       </div>
+
+      {showWizard && (
+        <CampaignWizard
+          onClose={() => setShowWizard(false)}
+          onSuccess={handleWizardSuccess}
+        />
+      )}
     </div>
   );
 };
