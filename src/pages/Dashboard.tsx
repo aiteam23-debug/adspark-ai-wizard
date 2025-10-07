@@ -91,12 +91,19 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card">
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-8 h-8 text-primary" />
-              <span className="text-2xl font-heading font-bold">AdSpark AI</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-8 h-8 text-primary animate-sparkle" />
+                <span className="text-2xl font-heading font-bold">AdSpark AI</span>
+              </div>
+              <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                <span className="text-xs font-semibold text-primary">
+                  Beta – Free Forever (For Now) ✨
+                </span>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-muted-foreground font-body">
@@ -143,7 +150,7 @@ const Dashboard = () => {
               </div>
             </div>
             <Button 
-              className="w-full btn-press bg-primary hover:bg-primary/90 text-primary-foreground font-heading"
+              className="w-full btn-press btn-glow bg-primary hover:bg-primary/90 text-primary-foreground font-heading transition-all"
               onClick={(e) => {
                 e.stopPropagation();
                 setShowWizard(true);
@@ -210,7 +217,7 @@ const Dashboard = () => {
                 Our AI will handle everything from keywords to ad copy.
               </p>
               <Button 
-                className="btn-press bg-primary hover:bg-primary/90 text-primary-foreground font-heading font-semibold"
+                className="btn-press btn-glow bg-primary hover:bg-primary/90 text-primary-foreground font-heading font-semibold transition-all"
                 onClick={() => setShowWizard(true)}
               >
                 <Plus className="w-5 h-5 mr-2" />

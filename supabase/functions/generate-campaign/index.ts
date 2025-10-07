@@ -18,41 +18,76 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are an expert Google Ads campaign optimizer. Generate highly effective Google Ads campaigns based on user input.
+    const systemPrompt = `You are a Google Ads certified expert. Generate hyper-optimized, ultra-detailed Google Ads campaigns based on user input.
 
 CRITICAL RULES:
-- Generate exactly 3 campaign variants
-- Each variant must be UNIQUE with different strategies
-- Headlines: Max 30 characters each
-- Descriptions: Max 90 characters each
-- Keywords must be high-intent, specific to the business
-- Ensure all content is truthful and compliant (no guarantees, no misleading claims)
-- Target diverse audience segments across variants
+- Generate exactly 3 campaign variants with UNIQUE strategies
+- Headlines: Max 30 characters each (15 per ad for responsive search)
+- Descriptions: Max 90 characters each (4 per ad)
+- Keywords: 15 high-intent keywords per campaign (mix broad/phrase/exact)
+- All content must be 100% Google policy compliant (truthful, no guarantees, mobile-optimized)
+- Provide realistic performance estimates
+- Include comprehensive targeting and extensions
 
 Return ONLY valid JSON in this exact format, no markdown or extra text:
 {
   "variants": [
     {
-      "campaign_name": "Campaign Name Here",
-      "strategy": "Brief strategy description",
-      "keywords": ["keyword1", "keyword2", ...] (10 keywords),
-      "ad_variations": [
-        {
-          "headlines": ["Headline 1", "Headline 2", "Headline 3"],
-          "descriptions": ["Description 1", "Description 2"]
-        }
-      ] (5 ad variations),
-      "targeting": {
-        "locations": ["Location 1", "Location 2"],
-        "demographics": {
-          "age": "Age range",
-          "gender": "ALL/MALE/FEMALE",
-          "interests": ["Interest 1", "Interest 2"]
-        }
+      "campaign_name": "Engaging Campaign Name",
+      "strategy": "Detailed strategy description (2-3 sentences)",
+      "budget": {
+        "daily_micros": number (user budget * 1000000),
+        "pacing": "standard"
       },
       "bidding": {
         "strategy": "manual_cpc",
-        "bid_amount": number (in dollars)
+        "initial_bid_micros": number (50000-200000 based on competitiveness)
+      },
+      "keywords": {
+        "positive": ["keyword1", "keyword2", ...] (15 keywords with mix of match types),
+        "negative": ["neg1", "neg2", ...] (8 keywords)
+      },
+      "targeting": {
+        "locations": ["US", "CA", ...],
+        "demographics": {
+          "age_ranges": ["25-34", "35-44", ...],
+          "genders": ["ALL"],
+          "incomes": ["INCOME_TIER_3", ...],
+          "interests": ["interest1", ...] (10 interests)
+        },
+        "devices": "all",
+        "schedule": {
+          "start_hour": number (0-23),
+          "end_hour": number (0-23),
+          "days": ["MON", "TUE", ...]
+        }
+      },
+      "ad_groups": [
+        {
+          "name": "Ad Group Name",
+          "keywords_subset": ["keyword1", ...] (5 keywords),
+          "cpc_bid_micros": number
+        }
+      ] (3 ad groups),
+      "ads": [
+        {
+          "headlines": ["Headline 1", ...] (15 headlines, 30 chars max each),
+          "descriptions": ["Description 1", ...] (4 descriptions, 90 chars max each),
+          "paths": ["path1", "path2"],
+          "extensions": {
+            "sitelinks": [{"text": "Link Text", "url": "https://example.com/page"}] (4 sitelinks),
+            "callouts": ["Callout 1", ...] (4 callouts),
+            "snippets": {
+              "header": "Snippet Header",
+              "values": ["Value 1", ...] (5 values)
+            }
+          }
+        }
+      ] (8 ad variations),
+      "performance_estimate": {
+        "simulated_ctr": number (0.05-0.15),
+        "est_impressions": number (1000-5000),
+        "est_clicks": number (50-500)
       }
     }
   ]
@@ -74,12 +109,12 @@ Generate 3 unique Google Ads campaign variants optimized for this business.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        temperature: 0.7,
+        temperature: 0.8,
       }),
     });
 

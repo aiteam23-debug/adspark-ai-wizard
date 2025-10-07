@@ -41,13 +41,25 @@ export const CampaignWizard = ({ onClose, onSuccess }: CampaignWizardProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  // Step 1 - Input
+  // Step 1 - Input (Enhanced with more fields)
   const [formData, setFormData] = useState({
     businessDescription: "",
     targetAudience: "",
     budget: "",
     goals: "",
     websiteUrl: "",
+    campaignType: "Search",
+    sitelinks: ["", "", "", ""],
+    callouts: ["", "", "", ""],
+    snippetHeader: "",
+    snippetValues: ["", "", "", "", ""],
+    negativeKeywords: "",
+    adSchedule: { startHour: 0, endHour: 23, days: [] as string[] },
+    landingPageUrl: "",
+    advancedTargeting: {
+      incomeLevel: "",
+      parentalStatus: "",
+    },
   });
 
   // Step 2 - Generated variants
