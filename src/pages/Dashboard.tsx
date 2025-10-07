@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Sparkles, Plus, TrendingUp, BarChart3, LogOut } from "lucide-react";
+import { Sparkles, Plus, TrendingUp, BarChart3, LogOut, FileEdit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CampaignWizard } from "@/components/CampaignWizard";
+import { DraftsView } from "@/components/DraftsView";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Database } from "@/integrations/supabase/types";
 
 type Campaign = Database['public']['Tables']['campaigns']['Row'];
@@ -15,6 +17,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [showWizard, setShowWizard] = useState(false);
+  const [wizardData, setWizardData] = useState<any>(null);
+  const [draftId, setDraftId] = useState<string | undefined>();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -70,6 +74,12 @@ const Dashboard = () => {
     if (user) {
       loadCampaigns(user.id);
     }
+  };
+
+  const handleLoadDraft = (draftData: any, id: string) => {
+    setWizardData(draftData);
+    setDraftId(id);
+    setShowWizard(true);
   };
 
   const handleSignOut = async () => {
@@ -202,8 +212,18 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Campaigns List or Empty State */}
-        {campaigns.length === 0 ? (
+        {/* Tabs for Campaigns and Drafts */}
+        <Tabs defaultValue="campaigns" className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+            <TabsTrigger value="drafts">
+              <FileEdit className="w-4 h-4 mr-2" />
+              Drafts
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="campaigns">
+            {campaigns.length === 0 ? (
           <Card className="p-12 text-center">
             <div className="max-w-md mx-auto">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
@@ -282,12 +302,24 @@ const Dashboard = () => {
             </div>
           </div>
         )}
+          </TabsContent>
+
+          <TabsContent value="drafts">
+            <DraftsView onLoadDraft={handleLoadDraft} />
+          </TabsContent>
+        </Tabs>
       </div>
 
       {showWizard && (
         <CampaignWizard
-          onClose={() => setShowWizard(false)}
+          onClose={() => {
+            setShowWizard(false);
+            setWizardData(null);
+            setDraftId(undefined);
+          }}
           onSuccess={handleWizardSuccess}
+          initialData={wizardData}
+          draftId={draftId}
         />
       )}
     </div>

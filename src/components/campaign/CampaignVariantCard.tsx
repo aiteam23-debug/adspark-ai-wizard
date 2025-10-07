@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2 } from "lucide-react";
+import { GoogleAdPreview } from "./GoogleAdPreview";
 
 interface CampaignVariant {
   campaign_name: string;
@@ -65,28 +66,20 @@ export const CampaignVariantCard = ({
         </div>
       </div>
 
+      <div className="mb-4">
+        <h5 className="text-sm font-heading font-semibold mb-3">
+          Pixel-Perfect Google Ad Preview
+        </h5>
+        <GoogleAdPreview
+          headlines={variant.ad_variations[0].headlines}
+          descriptions={variant.ad_variations[0].descriptions}
+          displayUrl={(variant as any).targeting?.locations?.[0] || "example.com"}
+          sitelinks={(variant as any).ads?.[0]?.extensions?.sitelinks}
+          callouts={(variant as any).ads?.[0]?.extensions?.callouts}
+        />
+      </div>
+
       <div className="grid md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <h5 className="text-sm font-heading font-semibold mb-2">
-            Sample Ad Preview
-          </h5>
-          <div className="bg-muted p-3 rounded-lg space-y-2">
-            <div className="space-y-1">
-              {variant.ad_variations[0].headlines.map((headline, i) => (
-                <p key={i} className="text-sm font-semibold text-primary">
-                  {headline}
-                </p>
-              ))}
-            </div>
-            <div className="space-y-1">
-              {variant.ad_variations[0].descriptions.map((desc, i) => (
-                <p key={i} className="text-xs text-muted-foreground">
-                  {desc}
-                </p>
-              ))}
-            </div>
-          </div>
-        </div>
 
         <div>
           <h5 className="text-sm font-heading font-semibold mb-2">

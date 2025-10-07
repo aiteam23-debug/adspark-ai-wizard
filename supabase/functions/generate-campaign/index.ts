@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { businessDescription, targetAudience, budget, goals, websiteUrl } = await req.json();
+    const { businessDescription, targetAudience, budget, goals, websiteUrl, scrapedData, quickMode } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
@@ -93,13 +93,30 @@ Return ONLY valid JSON in this exact format, no markdown or extra text:
   ]
 }`;
 
-    const userPrompt = `Business: ${businessDescription}
+    let userPrompt = `Business: ${businessDescription}
 Target Audience: ${targetAudience}
 Daily Budget: $${budget}
 Goals: ${goals}
 Website: ${websiteUrl}
 
 Generate 3 unique Google Ads campaign variants optimized for this business.`;
+
+    // If scraped data is provided, enhance the prompt
+    if (scrapedData && quickMode) {
+      userPrompt += `\n\nSCRAPED WEBSITE DATA (use this to curate perfect campaigns):
+Title: ${scrapedData.title}
+Headlines: ${scrapedData.headlines.join(', ')}
+Description: ${scrapedData.description}
+Key Points: ${scrapedData.paragraphs.slice(0, 3).join(' ')}
+Stats: ${scrapedData.stats.join(', ')}
+Services/Features: ${scrapedData.listItems.slice(0, 5).join(', ')}
+
+Use this scraped data to:
+- Extract high-intent keywords from headlines and services
+- Craft compelling ad copy using actual site language
+- Incorporate stats and testimonials into descriptions and callouts
+- Target the exact audience this business serves`;
+    }
 
     console.log("Calling Lovable AI Gateway...");
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

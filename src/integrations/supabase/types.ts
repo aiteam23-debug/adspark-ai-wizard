@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_cache: {
+        Row: {
+          created_at: string
+          id: string
+          prompt_hash: string
+          response: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          prompt_hash: string
+          response: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          prompt_hash?: string
+          response?: Json
+        }
+        Relationships: []
+      }
       campaigns: {
         Row: {
           ad_variations: Json | null
@@ -57,6 +78,30 @@ export type Database = {
           name?: string
           status?: string
           target_audience?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      drafts: {
+        Row: {
+          campaign_data: Json
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          campaign_data: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          campaign_data?: Json
+          created_at?: string
+          id?: string
           updated_at?: string
           user_id?: string
         }

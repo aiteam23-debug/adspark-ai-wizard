@@ -52,3 +52,6 @@ enabled = true
 
 [functions.generate-campaign]
 verify_jwt = true
+
+[functions.scrape-url]
+verify_jwt = true

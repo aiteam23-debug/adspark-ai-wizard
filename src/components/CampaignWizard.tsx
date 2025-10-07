@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
+import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, Loader2, Link as LinkIcon } from "lucide-react";
 import { CampaignVariantCard } from "./campaign/CampaignVariantCard";
 
 interface CampaignVariant {
@@ -34,15 +34,20 @@ interface CampaignVariant {
 interface CampaignWizardProps {
   onClose: () => void;
   onSuccess: () => void;
+  initialData?: any;
+  draftId?: string;
 }
 
-export const CampaignWizard = ({ onClose, onSuccess }: CampaignWizardProps) => {
+export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: CampaignWizardProps) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [quickMode, setQuickMode] = useState(false);
+  const [scrapedData, setScrapedData] = useState<any>(null);
   const { toast } = useToast();
+  const autoSaveTimerRef = useRef<number | null>(null);
 
   // Step 1 - Input (Enhanced with more fields)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(initialData || {
     businessDescription: "",
     targetAudience: "",
     budget: "",
@@ -68,7 +73,94 @@ export const CampaignWizard = ({ onClose, onSuccess }: CampaignWizardProps) => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    scheduleAutoSave();
   };
+
+  // Auto-save functionality
+  const scheduleAutoSave = () => {
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+    autoSaveTimerRef.current = window.setTimeout(() => {
+      saveDraft();
+    }, 30000); // Auto-save after 30 seconds of inactivity
+  };
+
+  const saveDraft = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      if (draftId) {
+        // Update existing draft
+        await supabase
+          .from('drafts')
+          .update({ campaign_data: formData })
+          .eq('id', draftId);
+      } else {
+        // Create new draft
+        await supabase
+          .from('drafts')
+          .insert({ 
+            user_id: user.id,
+            campaign_data: formData 
+          });
+      }
+    } catch (error) {
+      console.error('Auto-save error:', error);
+    }
+  };
+
+  const scrapeUrl = async () => {
+    if (!formData.websiteUrl) {
+      toast({
+        title: "Error",
+        description: "Please enter a website URL first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('scrape-url', {
+        body: { url: formData.websiteUrl }
+      });
+
+      if (error) throw error;
+
+      setScrapedData(data);
+      setQuickMode(true);
+      
+      // Auto-fill some fields from scraped data
+      setFormData(prev => ({
+        ...prev,
+        businessDescription: prev.businessDescription || data.description || data.title,
+      }));
+
+      toast({
+        title: "URL Scraped! 🎯",
+        description: "Website data extracted. Click Generate for curated campaigns.",
+      });
+    } catch (error: any) {
+      console.error('Error scraping URL:', error);
+      toast({
+        title: "Scraping Failed",
+        description: "Couldn't scrape URL. You can still generate campaigns manually.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, []);
 
   const validateStep1 = () => {
     const { businessDescription, targetAudience, budget, goals, websiteUrl } = formData;
@@ -103,7 +195,11 @@ export const CampaignWizard = ({ onClose, onSuccess }: CampaignWizardProps) => {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-campaign', {
-        body: formData
+        body: { 
+          ...formData,
+          scrapedData,
+          quickMode 
+        }
       });
 
       if (error) throw error;
@@ -265,19 +361,35 @@ export const CampaignWizard = ({ onClose, onSuccess }: CampaignWizardProps) => {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="website" className="font-body font-medium">
-                  Website URL *
-                </Label>
+            <div>
+              <Label htmlFor="website" className="font-body font-medium">
+                Website URL *
+              </Label>
+              <div className="flex gap-2 mt-2">
                 <Input
                   id="website"
                   type="url"
                   placeholder="https://example.com"
                   value={formData.websiteUrl}
                   onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
-                  className="mt-2"
+                  className="flex-1"
                 />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={scrapeUrl}
+                  disabled={loading || !formData.websiteUrl}
+                >
+                  <LinkIcon className="w-4 h-4 mr-2" />
+                  Quick Scrape
+                </Button>
               </div>
+              {scrapedData && (
+                <p className="text-xs text-green-600 mt-1">
+                  ✓ URL scraped! Generating curated campaigns...
+                </p>
+              )}
+            </div>
             </div>
 
             <div>
