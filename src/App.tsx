@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import GoogleAdsCallback from "./pages/GoogleAdsCallback";
+import GoogleAdsDashboard from "./pages/GoogleAdsDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,7 +21,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/auth/callback" element={<GoogleAdsCallback />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/google-ads-dashboard" element={<GoogleAdsDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
