@@ -38,6 +38,10 @@ export const CampaignVariantCard = ({
   isSelected,
   onSelect,
 }: CampaignVariantCardProps) => {
+  // Defensive checks for data structure
+  const hasAdVariations = variant?.ad_variations && variant.ad_variations.length > 0;
+  const firstAdVariation = hasAdVariations ? variant.ad_variations[0] : null;
+  
   return (
     <Card
       className={`p-6 cursor-pointer transition-all ${
@@ -58,40 +62,41 @@ export const CampaignVariantCard = ({
             )}
           </div>
           <h4 className="text-lg font-heading font-bold mb-1">
-            {variant.campaign_name}
+            {variant?.campaign_name || "Untitled Campaign"}
           </h4>
           <p className="text-sm text-muted-foreground font-body">
-            {variant.strategy}
+            {variant?.strategy || "No strategy defined"}
           </p>
         </div>
       </div>
 
-      <div className="mb-4">
-        <h5 className="text-sm font-heading font-semibold mb-3">
-          Pixel-Perfect Google Ad Preview
-        </h5>
-        <GoogleAdPreview
-          headlines={variant.ad_variations[0].headlines}
-          descriptions={variant.ad_variations[0].descriptions}
-          displayUrl={(variant as any).targeting?.locations?.[0] || "example.com"}
-          sitelinks={(variant as any).ads?.[0]?.extensions?.sitelinks}
-          callouts={(variant as any).ads?.[0]?.extensions?.callouts}
-        />
-      </div>
+      {firstAdVariation && (
+        <div className="mb-4">
+          <h5 className="text-sm font-heading font-semibold mb-3">
+            Pixel-Perfect Google Ad Preview
+          </h5>
+          <GoogleAdPreview
+            headlines={firstAdVariation.headlines || []}
+            descriptions={firstAdVariation.descriptions || []}
+            displayUrl={variant?.targeting?.locations?.[0] || "example.com"}
+            sitelinks={(variant as any).ads?.[0]?.extensions?.sitelinks}
+            callouts={(variant as any).ads?.[0]?.extensions?.callouts}
+          />
+        </div>
+      )}
 
       <div className="grid md:grid-cols-2 gap-4 mb-4">
-
         <div>
           <h5 className="text-sm font-heading font-semibold mb-2">
             Top Keywords
           </h5>
           <div className="flex flex-wrap gap-1">
-            {variant.keywords.slice(0, 5).map((keyword, i) => (
+            {variant?.keywords?.slice(0, 5).map((keyword, i) => (
               <Badge key={i} variant="secondary" className="text-xs">
                 {keyword}
               </Badge>
-            ))}
-            {variant.keywords.length > 5 && (
+            )) || <p className="text-xs text-muted-foreground">No keywords available</p>}
+            {variant?.keywords && variant.keywords.length > 5 && (
               <Badge variant="secondary" className="text-xs">
                 +{variant.keywords.length - 5} more
               </Badge>
@@ -102,9 +107,9 @@ export const CampaignVariantCard = ({
             Targeting
           </h5>
           <div className="text-xs space-y-1 text-muted-foreground font-body">
-            <p>Age: {variant.targeting.demographics.age}</p>
-            <p>Gender: {variant.targeting.demographics.gender}</p>
-            <p>Locations: {variant.targeting.locations.join(", ")}</p>
+            <p>Age: {variant?.targeting?.demographics?.age || "Not specified"}</p>
+            <p>Gender: {variant?.targeting?.demographics?.gender || "Not specified"}</p>
+            <p>Locations: {variant?.targeting?.locations?.join(", ") || "Not specified"}</p>
           </div>
         </div>
       </div>
@@ -112,18 +117,18 @@ export const CampaignVariantCard = ({
       <div className="flex items-center justify-between pt-4 border-t">
         <div className="text-sm font-body">
           <span className="text-muted-foreground">Bid Strategy: </span>
-          <span className="font-semibold">{variant.bidding.strategy}</span>
+          <span className="font-semibold">{variant?.bidding?.strategy || "Not specified"}</span>
         </div>
         <div className="text-sm font-body">
           <span className="text-muted-foreground">Suggested Bid: </span>
           <span className="font-heading font-bold text-primary">
-            ${variant.bidding.bid_amount.toFixed(2)}
+            ${variant?.bidding?.bid_amount?.toFixed(2) || "0.00"}
           </span>
         </div>
       </div>
 
       <div className="mt-3 text-xs text-muted-foreground font-body">
-        {variant.ad_variations.length} ad variations • {variant.keywords.length} keywords
+        {variant?.ad_variations?.length || 0} ad variations • {variant?.keywords?.length || 0} keywords
       </div>
     </Card>
   );
