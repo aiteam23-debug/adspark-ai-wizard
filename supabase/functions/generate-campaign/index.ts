@@ -18,74 +18,73 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are a Google Ads certified expert. Generate 3 complete, unique campaign variants.
+    const budgetMicros = budget ? parseFloat(budget) * 1000000 : 50000000;
+    
+    const systemPrompt = `You are a Google Ads expert. Generate EXACTLY 3 campaign variants as valid JSON.
 
-CRITICAL RULES:
-- Generate EXACTLY 3 variants with different strategies
-- Each variant must be 100% complete with ALL fields filled
-- Use realistic, specific data (no placeholders or "example.com")
-- Keep headlines under 30 characters, descriptions under 90 characters
+CRITICAL OUTPUT RULES:
+- Return ONLY raw JSON (no markdown, no \`\`\`json blocks, no extra text)
+- Each variant MUST be complete with all required fields
+- Keep responses concise to fit within token limits
 
-REQUIRED FOR EACH VARIANT:
-✓ 12 positive keywords + 6 negative keywords
-✓ 3 complete ad variations
-✓ 12 headlines per ad (max 30 chars)
-✓ 4 descriptions per ad (max 90 chars)
-✓ 4 sitelinks, 4 callouts, 4 snippet values
-✓ 3 ad groups with keyword distribution
-✓ Complete targeting and performance estimates
-
-Return ONLY valid JSON (no markdown, no code blocks):
+REQUIRED STRUCTURE (all fields mandatory):
 {
   "variants": [
     {
-      "campaign_name": "Specific Campaign Name",
-      "strategy": "Clear 2-3 sentence strategy describing the approach and expected results",
-      "budget": {"daily_micros": (budget * 1000000), "pacing": "standard"},
+      "campaign_name": "Unique Campaign Name",
+      "strategy": "Brief 1-2 sentence strategy",
+      "budget": {"daily_micros": ${budgetMicros}, "pacing": "standard"},
       "bidding": {"strategy": "manual_cpc", "initial_bid_micros": 120000},
       "keywords": {
-        "positive": ["keyword1", "keyword2", ...12 total],
-        "negative": ["negative1", ...6 total]
+        "positive": ["kw1", "kw2", "kw3", "kw4", "kw5", "kw6", "kw7", "kw8", "kw9", "kw10"],
+        "negative": ["neg1", "neg2", "neg3", "neg4"]
       },
       "targeting": {
-        "locations": ["Country1", "Country2"],
+        "locations": ["United States"],
         "demographics": {
           "age_ranges": ["25-34", "35-44"],
           "genders": ["ALL"],
-          "incomes": ["INCOME_TIER_3", "INCOME_TIER_4"],
-          "interests": ["interest1", ...8 total]
+          "incomes": ["INCOME_TIER_3"],
+          "interests": ["topic1", "topic2", "topic3", "topic4"]
         },
         "devices": "all",
-        "schedule": {"start_hour": 6, "end_hour": 22, "days": ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]}
+        "schedule": {"start_hour": 6, "end_hour": 22, "days": ["MON","TUE","WED","THU","FRI"]}
       },
       "ad_groups": [
-        {"name": "Group 1", "keywords_subset": ["kw1", "kw2", "kw3", "kw4"], "cpc_bid_micros": 130000},
-        {"name": "Group 2", "keywords_subset": ["kw5", "kw6", "kw7", "kw8"], "cpc_bid_micros": 125000},
-        {"name": "Group 3", "keywords_subset": ["kw9", "kw10", "kw11", "kw12"], "cpc_bid_micros": 120000}
+        {"name": "Group A", "keywords_subset": ["kw1","kw2","kw3"], "cpc_bid_micros": 130000},
+        {"name": "Group B", "keywords_subset": ["kw4","kw5","kw6"], "cpc_bid_micros": 120000}
       ],
       "ads": [
         {
-          "headlines": ["H1", "H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "H10", "H11", "H12"],
-          "descriptions": ["Desc1 max 90 chars", "Desc2", "Desc3", "Desc4"],
+          "headlines": ["H1 max 30c", "H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "H10"],
+          "descriptions": ["D1 max 90 chars", "D2", "D3", "D4"],
           "paths": ["path1", "path2"],
           "extensions": {
             "sitelinks": [
-              {"text": "Link1", "url": "/page1"},
-              {"text": "Link2", "url": "/page2"},
-              {"text": "Link3", "url": "/page3"},
-              {"text": "Link4", "url": "/page4"}
+              {"text": "Link1", "url": "/p1"},
+              {"text": "Link2", "url": "/p2"}
             ],
-            "callouts": ["Callout1", "Callout2", "Callout3", "Callout4"],
-            "snippets": {"header": "Features", "values": ["Val1", "Val2", "Val3", "Val4"]}
+            "callouts": ["Callout1", "Callout2"],
+            "snippets": {"header": "Features", "values": ["V1", "V2"]}
           }
         },
-        ...2 more ads (3 total per variant)
+        {
+          "headlines": ["Alt H1", "Alt H2", "Alt H3", "Alt H4", "Alt H5", "Alt H6", "Alt H7", "Alt H8", "Alt H9", "Alt H10"],
+          "descriptions": ["Alt D1", "Alt D2", "Alt D3", "Alt D4"],
+          "paths": ["path1", "path2"],
+          "extensions": {
+            "sitelinks": [{"text": "Link3", "url": "/p3"}, {"text": "Link4", "url": "/p4"}],
+            "callouts": ["Callout3", "Callout4"],
+            "snippets": {"header": "Benefits", "values": ["V3", "V4"]}
+          }
+        }
       ],
-      "performance_estimate": {"simulated_ctr": 0.08, "est_impressions": 2500, "est_clicks": 200}
-    },
-    ...2 more variants (3 total)
+      "performance_estimate": {"simulated_ctr": 0.065, "est_impressions": 2000, "est_clicks": 130}
+    }
   ]
-}`;
+}
+
+Generate 3 variants with different strategies (broad reach, targeted conversion, brand awareness). Use real, relevant data based on the business context.`;
 
     let userPrompt = `Business: ${businessDescription}
 Target Audience: ${targetAudience}
@@ -112,13 +111,12 @@ Use this to create relevant ads and keywords.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        temperature: 0.7,
-        max_tokens: 8000,
+        max_tokens: 6000,
       }),
     });
 
@@ -198,19 +196,19 @@ Use this to create relevant ads and keywords.`;
       
       if (!variant.campaign_name) errors.push("missing campaign_name");
       if (!variant.strategy) errors.push("missing strategy");
-      if (!variant.keywords?.positive || variant.keywords.positive.length < 8) {
-        errors.push(`need 12+ keywords, got ${variant.keywords?.positive?.length || 0}`);
+      if (!variant.keywords?.positive || variant.keywords.positive.length < 5) {
+        errors.push(`need 5+ keywords, got ${variant.keywords?.positive?.length || 0}`);
       }
-      if (!variant.ads || variant.ads.length < 2) {
-        errors.push(`need 3 ads, got ${variant.ads?.length || 0}`);
+      if (!variant.ads || variant.ads.length < 1) {
+        errors.push(`need at least 1 ad, got ${variant.ads?.length || 0}`);
       }
       if (variant.ads) {
         variant.ads.forEach((ad: any, adIndex: number) => {
-          if (!ad.headlines || ad.headlines.length < 8) {
-            errors.push(`ad${adIndex}: need 12 headlines, got ${ad.headlines?.length || 0}`);
+          if (!ad.headlines || ad.headlines.length < 5) {
+            errors.push(`ad${adIndex}: need 5+ headlines, got ${ad.headlines?.length || 0}`);
           }
-          if (!ad.descriptions || ad.descriptions.length < 3) {
-            errors.push(`ad${adIndex}: need 4 descriptions, got ${ad.descriptions?.length || 0}`);
+          if (!ad.descriptions || ad.descriptions.length < 2) {
+            errors.push(`ad${adIndex}: need 2+ descriptions, got ${ad.descriptions?.length || 0}`);
           }
         });
       }
