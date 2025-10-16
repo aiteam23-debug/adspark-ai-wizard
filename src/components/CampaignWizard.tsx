@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, Loader2, Link as LinkIcon } from "lucide-react";
@@ -52,6 +53,7 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
     businessDescription: "",
     targetAudience: "",
     budget: "",
+    currency: "USD",
     goals: "",
     websiteUrl: "",
     campaignType: "Search",
@@ -398,18 +400,40 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <Label htmlFor="budget" className="font-body font-medium">
-                  Daily Budget ($) *
+                  Daily Budget *
                 </Label>
-                <Input
-                  id="budget"
-                  type="number"
-                  min="1"
-                  step="0.01"
-                  placeholder="50"
-                  value={formData.budget}
-                  onChange={(e) => handleInputChange('budget', e.target.value)}
-                  className="mt-2"
-                />
+                <div className="flex gap-2 mt-2">
+                  <Select
+                    value={formData.currency}
+                    onValueChange={(value) => handleInputChange('currency', value)}
+                  >
+                    <SelectTrigger className="w-[120px]">
+                      <SelectValue placeholder="Currency" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border-border z-50">
+                      <SelectItem value="USD">$ USD</SelectItem>
+                      <SelectItem value="EUR">€ EUR</SelectItem>
+                      <SelectItem value="GBP">£ GBP</SelectItem>
+                      <SelectItem value="JPY">¥ JPY</SelectItem>
+                      <SelectItem value="INR">₹ INR</SelectItem>
+                      <SelectItem value="CAD">C$ CAD</SelectItem>
+                      <SelectItem value="AUD">A$ AUD</SelectItem>
+                      <SelectItem value="CNY">¥ CNY</SelectItem>
+                      <SelectItem value="BRL">R$ BRL</SelectItem>
+                      <SelectItem value="MXN">$ MXN</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    id="budget"
+                    type="number"
+                    min="1"
+                    step="0.01"
+                    placeholder="50"
+                    value={formData.budget}
+                    onChange={(e) => handleInputChange('budget', e.target.value)}
+                    className="flex-1"
+                  />
+                </div>
               </div>
 
             <div>
