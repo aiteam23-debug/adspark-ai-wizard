@@ -270,6 +270,48 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
     }
   };
 
+  const saveManualDraft = async () => {
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const draftData = {
+        ...formData,
+        selectedVariant: selectedVariant !== null ? variants[selectedVariant] : null,
+        variants: variants
+      };
+
+      if (draftId) {
+        await supabase
+          .from('drafts')
+          .update({ campaign_data: draftData })
+          .eq('id', draftId);
+      } else {
+        await supabase
+          .from('drafts')
+          .insert({ 
+            user_id: user.id,
+            campaign_data: draftData
+          });
+      }
+
+      toast({
+        title: "✅ Draft saved successfully!",
+        description: "Your campaign progress has been saved.",
+      });
+    } catch (error: any) {
+      console.error('Error saving draft:', error);
+      toast({
+        title: "Save Failed",
+        description: error.message || "Failed to save draft. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const saveCampaign = async () => {
     if (selectedVariant === null) {
       toast({ title: "Error", description: "Please select a campaign variant", variant: "destructive" });
@@ -561,6 +603,7 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
                   index={selectedVariant}
                   isSelected={true}
                   onSelect={() => {}}
+                  hideLocation={true}
                 />
 
                 <div className="bg-muted p-4 rounded-lg">
@@ -584,23 +627,40 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back to Variants
                   </Button>
-                  <Button
-                    onClick={saveCampaign}
-                    disabled={loading}
-                    className="btn-press bg-primary hover:bg-primary/90 text-primary-foreground"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2 className="w-4 h-4 mr-2" />
-                        Save Campaign
-                      </>
-                    )}
-                  </Button>
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={saveManualDraft}
+                      disabled={loading}
+                      className="hover:bg-primary/10"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Draft"
+                      )}
+                    </Button>
+                    <Button
+                      onClick={saveCampaign}
+                      disabled={loading}
+                      className="btn-press bg-primary hover:bg-primary/90 text-primary-foreground"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="w-4 h-4 mr-2" />
+                          Save Campaign
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </>
             )}

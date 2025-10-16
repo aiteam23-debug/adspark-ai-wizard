@@ -70,6 +70,7 @@ interface CampaignVariantCardProps {
   index: number;
   isSelected: boolean;
   onSelect: () => void;
+  hideLocation?: boolean;
 }
 
 export const CampaignVariantCard = ({
@@ -77,6 +78,7 @@ export const CampaignVariantCard = ({
   index,
   isSelected,
   onSelect,
+  hideLocation = false,
 }: CampaignVariantCardProps) => {
   // Defensive checks for data structure - support both old and new format
   const hasAds = variant?.ads && variant.ads.length > 0;
@@ -162,7 +164,9 @@ export const CampaignVariantCard = ({
           <div className="text-xs space-y-1 text-muted-foreground font-body">
             <p>Age: {variant?.targeting?.demographics?.age_ranges?.join(", ") || variant?.targeting?.demographics?.age || "Not specified"}</p>
             <p>Gender: {variant?.targeting?.demographics?.genders?.join(", ") || variant?.targeting?.demographics?.gender || "Not specified"}</p>
-            <p>Locations: {variant?.targeting?.locations?.join(", ") || "Not specified"}</p>
+            {!hideLocation && (
+              <p>Locations: {variant?.targeting?.locations?.join(", ") || "Not specified"}</p>
+            )}
           </div>
         </div>
       </div>
