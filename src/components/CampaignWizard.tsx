@@ -468,11 +468,11 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {n8nResponse ? 'Generating Variants...' : 'Generating...'}
+                    {n8nResponse ? 'Generating Campaign Previews...' : 'Generating Preview...'}
                   </>
                 ) : (
                   <>
-                    Generate Campaigns
+                    Generate Campaign Preview
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </>
                 )}
