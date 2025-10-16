@@ -18,115 +18,74 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are a Google Ads certified expert. Generate hyper-optimized, ultra-detailed Google Ads campaigns based on user input.
+    const systemPrompt = `You are a Google Ads certified expert. Generate 3 complete, unique campaign variants.
 
-CRITICAL RULES - MUST FOLLOW EXACTLY:
-- Generate EXACTLY 3 COMPLETE campaign variants with UNIQUE strategies
-- EVERY field must be filled with realistic, actionable data
-- NO placeholders, NO "example.com", NO generic content
-- Each variant must be distinctly different in approach (e.g., aggressive growth, brand awareness, conversion-focused)
+CRITICAL RULES:
+- Generate EXACTLY 3 variants with different strategies
+- Each variant must be 100% complete with ALL fields filled
+- Use realistic, specific data (no placeholders or "example.com")
+- Keep headlines under 30 characters, descriptions under 90 characters
 
-MANDATORY SPECIFICATIONS:
-Headlines: EXACTLY 15 headlines per ad (max 30 characters each)
-Descriptions: EXACTLY 4 descriptions per ad (max 90 characters each)
-Keywords: EXACTLY 15 positive keywords + 8 negative keywords per campaign
-Ad Variations: EXACTLY 8 complete ad variations per campaign
-Ad Groups: EXACTLY 3 ad groups per campaign
-Sitelinks: EXACTLY 4 sitelinks with real page suggestions
-Callouts: EXACTLY 4 compelling callouts
-Snippet Values: EXACTLY 5 values for structured snippets
+REQUIRED FOR EACH VARIANT:
+✓ 12 positive keywords + 6 negative keywords
+✓ 3 complete ad variations
+✓ 12 headlines per ad (max 30 chars)
+✓ 4 descriptions per ad (max 90 chars)
+✓ 4 sitelinks, 4 callouts, 4 snippet values
+✓ 3 ad groups with keyword distribution
+✓ Complete targeting and performance estimates
 
-Return ONLY valid JSON in this EXACT format with ALL fields filled:
+Return ONLY valid JSON (no markdown, no code blocks):
 {
   "variants": [
     {
-      "campaign_name": "Compelling Campaign Name (unique for each variant)",
-      "strategy": "Detailed 2-3 sentence strategy explaining the approach and expected outcomes",
-      "budget": {
-        "daily_micros": (user_budget * 1000000),
-        "pacing": "standard"
-      },
-      "bidding": {
-        "strategy": "manual_cpc",
-        "initial_bid_micros": (realistic number between 50000-200000)
-      },
+      "campaign_name": "Specific Campaign Name",
+      "strategy": "Clear 2-3 sentence strategy describing the approach and expected results",
+      "budget": {"daily_micros": (budget * 1000000), "pacing": "standard"},
+      "bidding": {"strategy": "manual_cpc", "initial_bid_micros": 120000},
       "keywords": {
-        "positive": ["keyword1", "keyword2", ...15 total keywords with variety],
-        "negative": ["negative1", "negative2", ...8 total negative keywords]
+        "positive": ["keyword1", "keyword2", ...12 total],
+        "negative": ["negative1", ...6 total]
       },
       "targeting": {
-        "locations": ["United States", "Canada", "United Kingdom"],
+        "locations": ["Country1", "Country2"],
         "demographics": {
-          "age_ranges": ["25-34", "35-44", "45-54"],
+          "age_ranges": ["25-34", "35-44"],
           "genders": ["ALL"],
           "incomes": ["INCOME_TIER_3", "INCOME_TIER_4"],
-          "interests": ["interest1", "interest2", ...10 total relevant interests]
+          "interests": ["interest1", ...8 total]
         },
         "devices": "all",
-        "schedule": {
-          "start_hour": 6,
-          "end_hour": 22,
-          "days": ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
-        }
+        "schedule": {"start_hour": 6, "end_hour": 22, "days": ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]}
       },
       "ad_groups": [
-        {
-          "name": "Specific Ad Group Name 1",
-          "keywords_subset": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
-          "cpc_bid_micros": (realistic bid amount in micros)
-        },
-        {
-          "name": "Specific Ad Group Name 2",
-          "keywords_subset": ["keyword6", "keyword7", "keyword8", "keyword9", "keyword10"],
-          "cpc_bid_micros": (realistic bid amount in micros)
-        },
-        {
-          "name": "Specific Ad Group Name 3",
-          "keywords_subset": ["keyword11", "keyword12", "keyword13", "keyword14", "keyword15"],
-          "cpc_bid_micros": (realistic bid amount in micros)
-        }
+        {"name": "Group 1", "keywords_subset": ["kw1", "kw2", "kw3", "kw4"], "cpc_bid_micros": 130000},
+        {"name": "Group 2", "keywords_subset": ["kw5", "kw6", "kw7", "kw8"], "cpc_bid_micros": 125000},
+        {"name": "Group 3", "keywords_subset": ["kw9", "kw10", "kw11", "kw12"], "cpc_bid_micros": 120000}
       ],
       "ads": [
         {
-          "headlines": ["Headline 1", "Headline 2", ...15 total headlines, each ≤30 chars],
-          "descriptions": ["Description 1", "Description 2", "Description 3", "Description 4"],
-          "paths": ["products", "deals"],
+          "headlines": ["H1", "H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "H10", "H11", "H12"],
+          "descriptions": ["Desc1 max 90 chars", "Desc2", "Desc3", "Desc4"],
+          "paths": ["path1", "path2"],
           "extensions": {
             "sitelinks": [
-              {"text": "Product Category", "url": "/products"},
-              {"text": "Special Offers", "url": "/deals"},
-              {"text": "About Us", "url": "/about"},
-              {"text": "Contact", "url": "/contact"}
+              {"text": "Link1", "url": "/page1"},
+              {"text": "Link2", "url": "/page2"},
+              {"text": "Link3", "url": "/page3"},
+              {"text": "Link4", "url": "/page4"}
             ],
-            "callouts": ["Free Shipping", "24/7 Support", "Money Back Guarantee", "Trusted Since 2020"],
-            "snippets": {
-              "header": "Product Types",
-              "values": ["Value 1", "Value 2", "Value 3", "Value 4", "Value 5"]
-            }
+            "callouts": ["Callout1", "Callout2", "Callout3", "Callout4"],
+            "snippets": {"header": "Features", "values": ["Val1", "Val2", "Val3", "Val4"]}
           }
         },
-        ...7 more complete ad variations (8 total)
+        ...2 more ads (3 total per variant)
       ],
-      "performance_estimate": {
-        "simulated_ctr": (number between 0.05-0.15),
-        "est_impressions": (number between 1000-5000),
-        "est_clicks": (number between 50-500)
-      }
+      "performance_estimate": {"simulated_ctr": 0.08, "est_impressions": 2500, "est_clicks": 200}
     },
-    ...2 more complete variants (3 total)
+    ...2 more variants (3 total)
   ]
-}
-
-VALIDATION CHECKLIST - Ensure each variant has:
-✓ Unique campaign_name and strategy
-✓ 15 positive + 8 negative keywords
-✓ 3 ad groups with 5 keywords each
-✓ 8 complete ad variations
-✓ 15 headlines per ad (max 30 chars)
-✓ 4 descriptions per ad (max 90 chars)
-✓ 4 sitelinks, 4 callouts, 5 snippet values
-✓ Performance estimates
-✓ Complete targeting with locations, demographics, schedule`;
+}`;
 
     let userPrompt = `Business: ${businessDescription}
 Target Audience: ${targetAudience}
@@ -134,26 +93,18 @@ Daily Budget: $${budget}
 Goals: ${goals}
 Website: ${websiteUrl}
 
-Generate 3 unique Google Ads campaign variants optimized for this business.`;
+Generate 3 unique, complete Google Ads campaign variants.`;
 
-    // If scraped data is provided, enhance the prompt
     if (scrapedData && quickMode) {
-      userPrompt += `\n\nSCRAPED WEBSITE DATA (use this to curate perfect campaigns):
+      userPrompt += `\n\nWEBSITE DATA:
 Title: ${scrapedData.title}
-Headlines: ${scrapedData.headlines.join(', ')}
+Headlines: ${scrapedData.headlines?.slice(0, 3).join(', ')}
 Description: ${scrapedData.description}
-Key Points: ${scrapedData.paragraphs.slice(0, 3).join(' ')}
-Stats: ${scrapedData.stats.join(', ')}
-Services/Features: ${scrapedData.listItems.slice(0, 5).join(', ')}
 
-Use this scraped data to:
-- Extract high-intent keywords from headlines and services
-- Craft compelling ad copy using actual site language
-- Incorporate stats and testimonials into descriptions and callouts
-- Target the exact audience this business serves`;
+Use this to create relevant ads and keywords.`;
     }
 
-    console.log("Calling Lovable AI Gateway...");
+    console.log("Calling Lovable AI Gateway with gemini-2.5-pro...");
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -161,11 +112,13 @@ Use this scraped data to:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
+        temperature: 0.7,
+        max_tokens: 8000,
       }),
     });
 
@@ -194,63 +147,81 @@ Use this scraped data to:
     const aiResponse = data.choices?.[0]?.message?.content;
 
     if (!aiResponse) {
+      console.error("No AI response received");
       throw new Error("No response from AI");
     }
 
-    console.log("AI Response:", aiResponse);
+    console.log("AI Response length:", aiResponse.length);
 
-    // Parse JSON response
+    // Parse JSON - handle markdown and extract JSON object
     let campaigns;
     try {
-      // Remove markdown code blocks if present
-      const cleanedResponse = aiResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      let cleanedResponse = aiResponse.trim();
+      
+      // Remove markdown code blocks
+      cleanedResponse = cleanedResponse
+        .replace(/^```json\s*/i, '')
+        .replace(/^```\s*/i, '')
+        .replace(/\s*```$/i, '')
+        .trim();
+      
+      // Extract JSON object if there's extra text
+      const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        cleanedResponse = jsonMatch[0];
+      }
+      
+      console.log("Attempting to parse JSON...");
       campaigns = JSON.parse(cleanedResponse);
+      console.log("JSON parsed successfully");
+      
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
-      console.error("Raw response:", aiResponse);
-      throw new Error("Failed to parse AI response");
+      console.error("Failed to parse response (first 1000 chars):", aiResponse.substring(0, 1000));
+      throw new Error("Failed to parse AI response - invalid JSON");
     }
 
-    // Validate response structure
+    // Validate structure
     if (!campaigns.variants || !Array.isArray(campaigns.variants)) {
-      throw new Error("Invalid campaign structure from AI - missing variants array");
+      console.error("Invalid structure - missing variants array");
+      throw new Error("Invalid campaign structure - missing variants array");
     }
 
     if (campaigns.variants.length !== 3) {
       console.error(`Expected 3 variants, got ${campaigns.variants.length}`);
-      throw new Error(`AI must generate exactly 3 campaign variants, got ${campaigns.variants.length}`);
+      throw new Error(`Expected exactly 3 campaign variants, got ${campaigns.variants.length}`);
     }
 
-    // Validate each variant has required fields
+    // Validate each variant
     campaigns.variants.forEach((variant: any, index: number) => {
       const errors: string[] = [];
       
       if (!variant.campaign_name) errors.push("missing campaign_name");
       if (!variant.strategy) errors.push("missing strategy");
-      if (!variant.keywords?.positive || variant.keywords.positive.length < 10) {
-        errors.push(`insufficient positive keywords (${variant.keywords?.positive?.length || 0})`);
+      if (!variant.keywords?.positive || variant.keywords.positive.length < 8) {
+        errors.push(`need 12+ keywords, got ${variant.keywords?.positive?.length || 0}`);
       }
-      if (!variant.ads || variant.ads.length < 3) {
-        errors.push(`insufficient ads (${variant.ads?.length || 0})`);
+      if (!variant.ads || variant.ads.length < 2) {
+        errors.push(`need 3 ads, got ${variant.ads?.length || 0}`);
       }
       if (variant.ads) {
         variant.ads.forEach((ad: any, adIndex: number) => {
-          if (!ad.headlines || ad.headlines.length < 10) {
-            errors.push(`ad ${adIndex}: insufficient headlines (${ad.headlines?.length || 0})`);
+          if (!ad.headlines || ad.headlines.length < 8) {
+            errors.push(`ad${adIndex}: need 12 headlines, got ${ad.headlines?.length || 0}`);
           }
-          if (!ad.descriptions || ad.descriptions.length < 4) {
-            errors.push(`ad ${adIndex}: insufficient descriptions (${ad.descriptions?.length || 0})`);
+          if (!ad.descriptions || ad.descriptions.length < 3) {
+            errors.push(`ad${adIndex}: need 4 descriptions, got ${ad.descriptions?.length || 0}`);
           }
         });
       }
       
       if (errors.length > 0) {
-        console.error(`Variant ${index + 1} validation errors:`, errors);
+        console.error(`Variant ${index + 1} errors:`, errors);
         throw new Error(`Variant ${index + 1} incomplete: ${errors.join(", ")}`);
       }
     });
 
-    console.log("All variants validated successfully");
+    console.log("All 3 variants validated successfully!");
 
     return new Response(
       JSON.stringify(campaigns),
