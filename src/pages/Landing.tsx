@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Sparkles, Zap, Target, TrendingUp, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Landing = () => {
   return (
@@ -53,9 +55,90 @@ const Landing = () => {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="btn-press text-lg px-8 py-6 font-heading font-semibold border-primary/30 hover:bg-primary/5">
-              Watch Demo
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="lg" variant="outline" className="btn-press text-lg px-8 py-6 font-heading font-semibold border-primary/30 hover:bg-primary/5">
+                  Watch Demo
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-3xl max-h-[80vh]">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-heading font-bold">
+                    Quick Tour: Create Your First Google Ads Campaign in 3 Steps
+                  </DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="h-[60vh] pr-4">
+                  <div className="space-y-6 font-body">
+                    <p className="text-muted-foreground">
+                      Follow these simple steps to generate AI-powered Google Ads campaigns in minutes!
+                    </p>
+
+                    <div>
+                      <h3 className="text-lg font-heading font-bold mb-3 text-primary">
+                        Step 1: Sign Up & Access the Dashboard
+                      </h3>
+                      <ol className="list-decimal list-inside space-y-2 text-sm">
+                        <li>Click <strong>Sign Up</strong> at the top-right corner</li>
+                        <li>Enter your email (e.g., you@youremail.com) and create a password</li>
+                        <li>Click <strong>Create Account</strong> — you'll be logged in automatically</li>
+                        <li>You'll land on the main dashboard where you can create campaigns</li>
+                      </ol>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-heading font-bold mb-3 text-accent">
+                        Step 2: Fill in Your Campaign Details
+                      </h3>
+                      <ol className="list-decimal list-inside space-y-2 text-sm">
+                        <li>In the <strong>Campaign Setup</strong> tab, find the form on the left</li>
+                        <li>Enter your <strong>Website URL</strong> (e.g., www.myshop.com)</li>
+                        <li>Type a brief <strong>Business Description</strong> (e.g., "We sell handmade candles")</li>
+                        <li>Describe your <strong>Target Audience</strong> (e.g., "Home decor enthusiasts aged 25-45")</li>
+                        <li>Set your <strong>Daily Budget</strong> (e.g., 50)</li>
+                        <li>Choose your <strong>Currency</strong> from the dropdown (e.g., USD, EUR, GBP)</li>
+                        <li>Add <strong>Location Targeting</strong> (e.g., "United States, Canada")</li>
+                        <li>Click the big <strong>Generate Campaign Preview</strong> button at the bottom</li>
+                      </ol>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-heading font-bold mb-3 text-primary">
+                        Step 3: Review & Save Your Campaign
+                      </h3>
+                      <ol className="list-decimal list-inside space-y-2 text-sm">
+                        <li>The page automatically switches to the <strong>Generated Campaigns</strong> tab</li>
+                        <li>You'll see 3 campaign variants with ad previews, keywords, and extensions</li>
+                        <li>Scroll through each variant to see headlines, descriptions, and sitelinks</li>
+                        <li>Choose your favorite variant (or keep all three!)</li>
+                        <li>Click <strong>Save as Draft</strong> to save for later (OPTIONAL)</li>
+                        <li>Your campaigns are now ready to review and refine!</li>
+                      </ol>
+                    </div>
+
+                    <div className="bg-muted/50 p-4 rounded-lg">
+                      <p className="text-xs text-muted-foreground mb-2">
+                        <em>Mobile note: On mobile, scroll down to see all form fields and the generate button.</em>
+                      </p>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-2">If something goes wrong:</h4>
+                      <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                        <li>Page won't load? Refresh (Ctrl/Cmd+R) or try incognito mode</li>
+                        <li>Preview not showing? Check that all required fields are filled in</li>
+                        <li>Still stuck? Clear your browser cache or try a different browser</li>
+                      </ul>
+                    </div>
+
+                    <div className="text-center pt-4 border-t">
+                      <p className="text-sm font-medium">
+                        Need more help? Contact support or use the chat feature for assistance.
+                      </p>
+                    </div>
+                  </div>
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
