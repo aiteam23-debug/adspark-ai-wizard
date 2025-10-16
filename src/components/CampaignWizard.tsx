@@ -361,6 +361,14 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
         {/* Step 1: Input */}
         {step === 1 && (
           <div className="space-y-6 animate-fade-in">
+            {/* Show n8n response if available */}
+            {n8nResponse && (
+              <div className="p-4 bg-muted rounded-lg border border-border animate-fade-in">
+                <h4 className="font-heading font-semibold mb-2">AI Campaign Strategy</h4>
+                <AdCampaignDisplay response={n8nResponse} />
+              </div>
+            )}
+
             <div>
               <Label htmlFor="business" className="font-body font-medium">
                 Business Description *
@@ -460,7 +468,7 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Generating...
+                    {n8nResponse ? 'Generating Variants...' : 'Generating...'}
                   </>
                 ) : (
                   <>
