@@ -244,12 +244,15 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
         throw new Error(`Generation failed: ${error.message}`);
       }
 
-      if (data.error) {
+      if (data?.error) {
+        console.error("AI generation error:", data.error);
         throw new Error(data.error);
       }
 
-      if (!data.variants || data.variants.length !== 3) {
-        throw new Error("Invalid response from AI");
+      // The function returns { variants: [...] }
+      if (!data?.variants || !Array.isArray(data.variants) || data.variants.length === 0) {
+        console.error("Invalid data structure:", data);
+        throw new Error('No campaign variants generated');
       }
 
       setVariants(data.variants);
