@@ -20,78 +20,113 @@ serve(async (req) => {
 
     const systemPrompt = `You are a Google Ads certified expert. Generate hyper-optimized, ultra-detailed Google Ads campaigns based on user input.
 
-CRITICAL RULES:
-- Generate exactly 3 campaign variants with UNIQUE strategies
-- Headlines: Max 30 characters each (15 per ad for responsive search)
-- Descriptions: Max 90 characters each (4 per ad)
-- Keywords: 15 high-intent keywords per campaign (mix broad/phrase/exact)
-- All content must be 100% Google policy compliant (truthful, no guarantees, mobile-optimized)
-- Provide realistic performance estimates
-- Include comprehensive targeting and extensions
+CRITICAL RULES - MUST FOLLOW EXACTLY:
+- Generate EXACTLY 3 COMPLETE campaign variants with UNIQUE strategies
+- EVERY field must be filled with realistic, actionable data
+- NO placeholders, NO "example.com", NO generic content
+- Each variant must be distinctly different in approach (e.g., aggressive growth, brand awareness, conversion-focused)
 
-Return ONLY valid JSON in this exact format, no markdown or extra text:
+MANDATORY SPECIFICATIONS:
+Headlines: EXACTLY 15 headlines per ad (max 30 characters each)
+Descriptions: EXACTLY 4 descriptions per ad (max 90 characters each)
+Keywords: EXACTLY 15 positive keywords + 8 negative keywords per campaign
+Ad Variations: EXACTLY 8 complete ad variations per campaign
+Ad Groups: EXACTLY 3 ad groups per campaign
+Sitelinks: EXACTLY 4 sitelinks with real page suggestions
+Callouts: EXACTLY 4 compelling callouts
+Snippet Values: EXACTLY 5 values for structured snippets
+
+Return ONLY valid JSON in this EXACT format with ALL fields filled:
 {
   "variants": [
     {
-      "campaign_name": "Engaging Campaign Name",
-      "strategy": "Detailed strategy description (2-3 sentences)",
+      "campaign_name": "Compelling Campaign Name (unique for each variant)",
+      "strategy": "Detailed 2-3 sentence strategy explaining the approach and expected outcomes",
       "budget": {
-        "daily_micros": number (user budget * 1000000),
+        "daily_micros": (user_budget * 1000000),
         "pacing": "standard"
       },
       "bidding": {
         "strategy": "manual_cpc",
-        "initial_bid_micros": number (50000-200000 based on competitiveness)
+        "initial_bid_micros": (realistic number between 50000-200000)
       },
       "keywords": {
-        "positive": ["keyword1", "keyword2", ...] (15 keywords with mix of match types),
-        "negative": ["neg1", "neg2", ...] (8 keywords)
+        "positive": ["keyword1", "keyword2", ...15 total keywords with variety],
+        "negative": ["negative1", "negative2", ...8 total negative keywords]
       },
       "targeting": {
-        "locations": ["US", "CA", ...],
+        "locations": ["United States", "Canada", "United Kingdom"],
         "demographics": {
-          "age_ranges": ["25-34", "35-44", ...],
+          "age_ranges": ["25-34", "35-44", "45-54"],
           "genders": ["ALL"],
-          "incomes": ["INCOME_TIER_3", ...],
-          "interests": ["interest1", ...] (10 interests)
+          "incomes": ["INCOME_TIER_3", "INCOME_TIER_4"],
+          "interests": ["interest1", "interest2", ...10 total relevant interests]
         },
         "devices": "all",
         "schedule": {
-          "start_hour": number (0-23),
-          "end_hour": number (0-23),
-          "days": ["MON", "TUE", ...]
+          "start_hour": 6,
+          "end_hour": 22,
+          "days": ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
         }
       },
       "ad_groups": [
         {
-          "name": "Ad Group Name",
-          "keywords_subset": ["keyword1", ...] (5 keywords),
-          "cpc_bid_micros": number
+          "name": "Specific Ad Group Name 1",
+          "keywords_subset": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
+          "cpc_bid_micros": (realistic bid amount in micros)
+        },
+        {
+          "name": "Specific Ad Group Name 2",
+          "keywords_subset": ["keyword6", "keyword7", "keyword8", "keyword9", "keyword10"],
+          "cpc_bid_micros": (realistic bid amount in micros)
+        },
+        {
+          "name": "Specific Ad Group Name 3",
+          "keywords_subset": ["keyword11", "keyword12", "keyword13", "keyword14", "keyword15"],
+          "cpc_bid_micros": (realistic bid amount in micros)
         }
-      ] (3 ad groups),
+      ],
       "ads": [
         {
-          "headlines": ["Headline 1", ...] (15 headlines, 30 chars max each),
-          "descriptions": ["Description 1", ...] (4 descriptions, 90 chars max each),
-          "paths": ["path1", "path2"],
+          "headlines": ["Headline 1", "Headline 2", ...15 total headlines, each ≤30 chars],
+          "descriptions": ["Description 1", "Description 2", "Description 3", "Description 4"],
+          "paths": ["products", "deals"],
           "extensions": {
-            "sitelinks": [{"text": "Link Text", "url": "https://example.com/page"}] (4 sitelinks),
-            "callouts": ["Callout 1", ...] (4 callouts),
+            "sitelinks": [
+              {"text": "Product Category", "url": "/products"},
+              {"text": "Special Offers", "url": "/deals"},
+              {"text": "About Us", "url": "/about"},
+              {"text": "Contact", "url": "/contact"}
+            ],
+            "callouts": ["Free Shipping", "24/7 Support", "Money Back Guarantee", "Trusted Since 2020"],
             "snippets": {
-              "header": "Snippet Header",
-              "values": ["Value 1", ...] (5 values)
+              "header": "Product Types",
+              "values": ["Value 1", "Value 2", "Value 3", "Value 4", "Value 5"]
             }
           }
-        }
-      ] (8 ad variations),
+        },
+        ...7 more complete ad variations (8 total)
+      ],
       "performance_estimate": {
-        "simulated_ctr": number (0.05-0.15),
-        "est_impressions": number (1000-5000),
-        "est_clicks": number (50-500)
+        "simulated_ctr": (number between 0.05-0.15),
+        "est_impressions": (number between 1000-5000),
+        "est_clicks": (number between 50-500)
       }
-    }
+    },
+    ...2 more complete variants (3 total)
   ]
-}`;
+}
+
+VALIDATION CHECKLIST - Ensure each variant has:
+✓ Unique campaign_name and strategy
+✓ 15 positive + 8 negative keywords
+✓ 3 ad groups with 5 keywords each
+✓ 8 complete ad variations
+✓ 15 headlines per ad (max 30 chars)
+✓ 4 descriptions per ad (max 90 chars)
+✓ 4 sitelinks, 4 callouts, 5 snippet values
+✓ Performance estimates
+✓ Complete targeting with locations, demographics, schedule`;
 
     let userPrompt = `Business: ${businessDescription}
 Target Audience: ${targetAudience}
@@ -177,9 +212,45 @@ Use this scraped data to:
     }
 
     // Validate response structure
-    if (!campaigns.variants || !Array.isArray(campaigns.variants) || campaigns.variants.length !== 3) {
-      throw new Error("Invalid campaign structure from AI");
+    if (!campaigns.variants || !Array.isArray(campaigns.variants)) {
+      throw new Error("Invalid campaign structure from AI - missing variants array");
     }
+
+    if (campaigns.variants.length !== 3) {
+      console.error(`Expected 3 variants, got ${campaigns.variants.length}`);
+      throw new Error(`AI must generate exactly 3 campaign variants, got ${campaigns.variants.length}`);
+    }
+
+    // Validate each variant has required fields
+    campaigns.variants.forEach((variant: any, index: number) => {
+      const errors: string[] = [];
+      
+      if (!variant.campaign_name) errors.push("missing campaign_name");
+      if (!variant.strategy) errors.push("missing strategy");
+      if (!variant.keywords?.positive || variant.keywords.positive.length < 10) {
+        errors.push(`insufficient positive keywords (${variant.keywords?.positive?.length || 0})`);
+      }
+      if (!variant.ads || variant.ads.length < 3) {
+        errors.push(`insufficient ads (${variant.ads?.length || 0})`);
+      }
+      if (variant.ads) {
+        variant.ads.forEach((ad: any, adIndex: number) => {
+          if (!ad.headlines || ad.headlines.length < 10) {
+            errors.push(`ad ${adIndex}: insufficient headlines (${ad.headlines?.length || 0})`);
+          }
+          if (!ad.descriptions || ad.descriptions.length < 4) {
+            errors.push(`ad ${adIndex}: insufficient descriptions (${ad.descriptions?.length || 0})`);
+          }
+        });
+      }
+      
+      if (errors.length > 0) {
+        console.error(`Variant ${index + 1} validation errors:`, errors);
+        throw new Error(`Variant ${index + 1} incomplete: ${errors.join(", ")}`);
+      }
+    });
+
+    console.log("All variants validated successfully");
 
     return new Response(
       JSON.stringify(campaigns),
