@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, Loader2, Link as LinkIcon } from "lucide-react";
 import { CampaignVariantCard } from "./campaign/CampaignVariantCard";
+import { AdCampaignDisplay } from "./campaign/AdCampaignDisplay";
 
 interface CampaignVariant {
   campaign_name: string;
@@ -469,16 +470,8 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
 
             {n8nResponse && (
               <div className="mb-6">
-                <Label htmlFor="n8nResponse" className="font-body font-medium mb-2 block">
-                  n8n Response
-                </Label>
-                <Textarea
-                  id="n8nResponse"
-                  value={n8nResponse}
-                  onChange={(e) => setN8nResponse(e.target.value)}
-                  className="min-h-[120px] font-mono text-sm"
-                  placeholder="Response from n8n will appear here..."
-                />
+                <h3 className="text-lg font-heading font-semibold mb-4">AI-Generated Campaign Strategy</h3>
+                <AdCampaignDisplay response={n8nResponse} />
               </div>
             )}
 
