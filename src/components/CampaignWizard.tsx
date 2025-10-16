@@ -207,7 +207,7 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
 
       let n8nData = "";
       try {
-        const n8nResponse = await fetch('https://vedant0409kasat.app.n8n.cloud/webhook-test/4de14b93-8334-4a09-ac3f-f680b9863486', {
+        const n8nResponse = await fetch('https://vedant0409kasat.app.n8n.cloud/webhook/4de14b93-8334-4a09-ac3f-f680b9863486', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
