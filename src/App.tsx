@@ -8,6 +8,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import GoogleAdsCallback from "./pages/GoogleAdsCallback";
 import GoogleAdsDashboard from "./pages/GoogleAdsDashboard";
+import CampaignOutput from "./pages/CampaignOutput";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/auth/callback" element={<GoogleAdsCallback />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/google-ads-dashboard" element={<GoogleAdsDashboard />} />
+          <Route path="/campaign-output" element={<CampaignOutput />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
