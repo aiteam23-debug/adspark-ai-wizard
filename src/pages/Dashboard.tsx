@@ -7,6 +7,7 @@ import { Sparkles, Plus, TrendingUp, BarChart3, LogOut, FileEdit } from "lucide-
 import { useToast } from "@/hooks/use-toast";
 import { CampaignWizard } from "@/components/CampaignWizard";
 import { DraftsView } from "@/components/DraftsView";
+import { PerformanceModal } from "@/components/PerformanceModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -17,6 +18,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [showWizard, setShowWizard] = useState(false);
+  const [showPerformance, setShowPerformance] = useState(false);
   const [wizardData, setWizardData] = useState<any>(null);
   const [draftId, setDraftId] = useState<string | undefined>();
   const navigate = useNavigate();
@@ -170,14 +172,17 @@ const Dashboard = () => {
             </Button>
           </Card>
 
-          <Card className="p-6 card-lift">
+          <Card 
+            className="p-6 card-lift cursor-pointer hover:border-accent/30 transition-all hover:shadow-lg"
+            onClick={() => setShowPerformance(true)}
+          >
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center hover:bg-accent/20 transition-colors">
                 <TrendingUp className="w-6 h-6 text-accent" />
               </div>
               <div>
                 <h3 className="font-heading font-bold text-lg">Performance</h3>
-                <p className="text-sm text-muted-foreground font-body">This week</p>
+                <p className="text-sm text-muted-foreground font-body">View detailed metrics</p>
               </div>
             </div>
             <div className="space-y-2">
@@ -194,6 +199,15 @@ const Dashboard = () => {
                 </span>
               </div>
             </div>
+            <Button 
+              className="w-full mt-4 btn-press bg-accent hover:bg-accent/90 text-accent-foreground font-heading transition-all"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowPerformance(true);
+              }}
+            >
+              View Details
+            </Button>
           </Card>
 
           <Card className="p-6 card-lift">
@@ -322,6 +336,12 @@ const Dashboard = () => {
           draftId={draftId}
         />
       )}
+
+      <PerformanceModal
+        open={showPerformance}
+        onOpenChange={setShowPerformance}
+        campaigns={campaigns}
+      />
     </div>
   );
 };
