@@ -205,21 +205,30 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
         campaignGoals: formData.goals
       };
 
-      const n8nResponse = await fetch('https://vedant0409kasat.app.n8n.cloud/webhook-test/4de14b93-8334-4a09-ac3f-f680b9863486', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(n8nPayload)
-      });
+      let n8nData = "";
+      try {
+        const n8nResponse = await fetch('https://vedant0409kasat.app.n8n.cloud/webhook-test/4de14b93-8334-4a09-ac3f-f680b9863486', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(n8nPayload)
+        });
 
-      if (!n8nResponse.ok) {
-        throw new Error('Failed to send data to n8n');
+        if (n8nResponse.ok) {
+          n8nData = await n8nResponse.text();
+          setN8nResponse(n8nData);
+          console.log("n8n response received:", n8nData);
+        } else {
+          console.error("n8n webhook failed:", n8nResponse.status);
+          throw new Error('Failed to pitch - n8n webhook error');
+        }
+      } catch (n8nError: any) {
+        console.error("n8n error:", n8nError);
+        throw new Error(`Failed to pitch: ${n8nError.message}`);
       }
 
-      const n8nData = await n8nResponse.text();
-      setN8nResponse(n8nData);
-
+      console.log("Calling generate-campaign function...");
       const { data, error } = await supabase.functions.invoke('generate-campaign', {
         body: { 
           ...formData,
@@ -228,7 +237,12 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
         }
       });
 
-      if (error) throw error;
+      console.log("generate-campaign response:", data, error);
+
+      if (error) {
+        console.error("Supabase function error:", error);
+        throw new Error(`Generation failed: ${error.message}`);
+      }
 
       if (data.error) {
         throw new Error(data.error);
