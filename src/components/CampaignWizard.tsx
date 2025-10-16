@@ -70,6 +70,7 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
   // Step 2 - Generated variants
   const [variants, setVariants] = useState<CampaignVariant[]>([]);
   const [selectedVariant, setSelectedVariant] = useState<number | null>(null);
+  const [n8nResponse, setN8nResponse] = useState<string>("");
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -194,6 +195,30 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
 
     setLoading(true);
     try {
+      // Send data to n8n webhook
+      const n8nPayload = {
+        businessDescription: formData.businessDescription,
+        targetAudience: formData.targetAudience,
+        dailyBudget: formData.budget,
+        websiteUrl: formData.websiteUrl,
+        campaignGoals: formData.goals
+      };
+
+      const n8nResponse = await fetch('https://vedant0409kasat.app.n8n.cloud/webhook-test/4de14b93-8334-4a09-ac3f-f680b9863486', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(n8nPayload)
+      });
+
+      if (!n8nResponse.ok) {
+        throw new Error('Failed to send data to n8n');
+      }
+
+      const n8nData = await n8nResponse.text();
+      setN8nResponse(n8nData);
+
       const { data, error } = await supabase.functions.invoke('generate-campaign', {
         body: { 
           ...formData,
@@ -216,7 +241,7 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
       setStep(2);
       toast({
         title: "Success! ✨",
-        description: "3 campaign variants generated. Choose your favorite!",
+        description: "Campaign data sent to n8n and variants generated!",
       });
     } catch (error: any) {
       console.error("Error generating campaigns:", error);
@@ -441,6 +466,21 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
                 Our AI generated 3 unique campaign strategies. Select the one that best fits your goals.
               </p>
             </div>
+
+            {n8nResponse && (
+              <div className="mb-6">
+                <Label htmlFor="n8nResponse" className="font-body font-medium mb-2 block">
+                  n8n Response
+                </Label>
+                <Textarea
+                  id="n8nResponse"
+                  value={n8nResponse}
+                  onChange={(e) => setN8nResponse(e.target.value)}
+                  className="min-h-[120px] font-mono text-sm"
+                  placeholder="Response from n8n will appear here..."
+                />
+              </div>
+            )}
 
             <div className="space-y-4">
               {variants.map((variant, index) => (
