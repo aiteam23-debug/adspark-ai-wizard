@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,7 @@ interface CampaignWizardProps {
 }
 
 export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: CampaignWizardProps) => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [quickMode, setQuickMode] = useState(false);
@@ -347,13 +349,34 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
 
       if (error) throw error;
 
+      // Extract campaign data from n8n response for the output page
+      const parseSection = (text: string, markers: string[]) => {
+        for (const marker of markers) {
+          const regex = new RegExp(`${marker}[:\\s]*([\\s\\S]*?)(?=\\n\\n|\\n(?:🎯|💬|🔖|🔍|🚀)|$)`, 'i');
+          const match = text.match(regex);
+          if (match) return match[1].trim();
+        }
+        return "";
+      };
+
+      const campaignData = {
+        title: parseSection(n8nResponse, ["🎯 Title:", "Title:", "Campaign Title:"]) || variant.campaign_name,
+        adCopy: parseSection(n8nResponse, ["💬 Ad Copy:", "Ad Copy:", "Description:"]) || variant.strategy,
+        hashtags: parseSection(n8nResponse, ["🔖 Hashtags:", "Hashtags:"]) || variant.keywords.map(k => `#${k}`).join(" "),
+        keywords: parseSection(n8nResponse, ["🔍 Keywords:", "Keywords:"]) || variant.keywords.join(", "),
+        cta: parseSection(n8nResponse, ["🚀 CTA:", "CTA:", "Call to Action:"]) || "Get Started Today!"
+      };
+
       toast({
         title: "Campaign Saved! 🎉",
-        description: "Your campaign has been saved as a draft.",
+        description: "Redirecting to your campaign output...",
       });
 
       onSuccess();
       onClose();
+      
+      // Navigate to the stunning campaign output page
+      navigate("/campaign-output", { state: { campaignData } });
     } catch (error: any) {
       console.error("Error saving campaign:", error);
       toast({

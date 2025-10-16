@@ -73,11 +73,12 @@ CTA: ${campaignData.cta}
   const hashtags = campaignData.hashtags.split(" ").filter(tag => tag.trim());
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-background relative overflow-hidden">
-      {/* Animated background elements */}
+    <div className="min-h-screen bg-gradient-to-br from-background via-[hsl(39_100%_5%)] to-background relative overflow-hidden">
+      {/* Animated background elements with warm colors */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-[hsl(39_100%_58%)]/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[hsl(16_100%_66%)]/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-[hsl(172_100%_41%)]/5 rounded-full blur-3xl animate-pulse delay-300"></div>
       </div>
 
       {/* Confetti effect */}
@@ -130,125 +131,139 @@ CTA: ${campaignData.cta}
         </div>
 
         {/* Campaign Title Section */}
-        <Card className="p-8 mb-6 card-lift bg-gradient-to-br from-background to-primary/5 border-primary/20 animate-fade-in">
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-primary-foreground" />
+        <Card className="p-8 mb-6 card-lift bg-gradient-to-br from-[hsl(39_100%_5%)] to-[hsl(16_100%_5%)] border-[hsl(39_100%_58%)]/30 animate-fade-in relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(39_100%_58%)]/5 via-transparent to-[hsl(16_100%_66%)]/5 animate-shimmer"></div>
+          <div className="relative">
+            <div className="flex items-start justify-between gap-4 mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[hsl(39_100%_58%)] to-[hsl(16_100%_66%)] flex items-center justify-center shadow-lg shadow-[hsl(39_100%_58%)]/20">
+                  <Sparkles className="w-6 h-6 text-background" />
+                </div>
+                <h2 className="text-sm font-heading font-semibold text-muted-foreground uppercase tracking-wide">✨ Campaign Title</h2>
               </div>
-              <h2 className="text-sm font-heading font-semibold text-muted-foreground uppercase tracking-wide">Campaign Title</h2>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => copyToClipboard(campaignData.title, "Title")}
+                className="hover:bg-[hsl(39_100%_58%)]/10"
+              >
+                {copiedSection === "Title" ? (
+                  <CheckCircle2 className="w-4 h-4 text-accent" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </Button>
             </div>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => copyToClipboard(campaignData.title, "Title")}
-              className="hover:bg-primary/10"
-            >
-              {copiedSection === "Title" ? (
-                <CheckCircle2 className="w-4 h-4 text-accent" />
-              ) : (
-                <Copy className="w-4 h-4" />
-              )}
-            </Button>
+            <h1 className="text-3xl md:text-5xl font-heading font-extrabold text-gradient-warm leading-tight drop-shadow-lg">
+              {campaignData.title}
+            </h1>
           </div>
-          <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground leading-tight">
-            {campaignData.title}
-          </h1>
         </Card>
 
         {/* Ad Copy Section */}
-        <Card className="p-8 mb-6 card-lift bg-gradient-to-br from-background to-accent/5 border-accent/20 animate-fade-in delay-100">
+        <Card className="p-8 mb-6 card-lift bg-gradient-to-br from-[hsl(172_100%_5%)] to-[hsl(39_100%_5%)] border-[hsl(172_100%_41%)]/30 animate-fade-in delay-100">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center">
-                <Megaphone className="w-6 h-6 text-accent-foreground" />
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[hsl(172_100%_41%)] to-[hsl(39_100%_58%)] flex items-center justify-center shadow-lg shadow-[hsl(172_100%_41%)]/20">
+                <Megaphone className="w-6 h-6 text-background" />
               </div>
-              <h2 className="text-sm font-heading font-semibold text-muted-foreground uppercase tracking-wide">Ad Copy</h2>
+              <h2 className="text-sm font-heading font-semibold text-muted-foreground uppercase tracking-wide">📝 Ad Copy</h2>
             </div>
             <Button
               size="sm"
               variant="ghost"
               onClick={() => copyToClipboard(campaignData.adCopy, "Ad Copy")}
-              className="hover:bg-accent/10"
+              className="hover:bg-[hsl(172_100%_41%)]/10"
             >
               {copiedSection === "Ad Copy" ? (
-                <CheckCircle2 className="w-4 h-4 text-accent" />
+                <CheckCircle2 className="w-4 h-4 text-[hsl(172_100%_41%)]" />
               ) : (
                 <Copy className="w-4 h-4" />
               )}
             </Button>
           </div>
-          <p className="text-lg font-body text-foreground/90 leading-relaxed">
-            {campaignData.adCopy}
-          </p>
+          <div className="bg-gradient-to-r from-muted/50 to-muted/30 rounded-xl p-6 border border-[hsl(172_100%_41%)]/10">
+            <p className="text-lg font-body text-foreground/90 leading-relaxed">
+              {campaignData.adCopy}
+            </p>
+          </div>
         </Card>
 
         {/* Two column layout for Hashtags and Keywords */}
         <div className="grid md:grid-cols-2 gap-6 mb-6">
           {/* Hashtags Section */}
-          <Card className="p-6 card-lift bg-gradient-to-br from-background to-primary/5 border-primary/20 animate-fade-in delay-200">
+          <Card className="p-6 card-lift bg-gradient-to-br from-[hsl(16_100%_5%)] to-[hsl(48_96%_5%)] border-[hsl(16_100%_66%)]/30 animate-fade-in delay-200">
             <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/80 to-accent/80 flex items-center justify-center">
-                  <Hash className="w-5 h-5 text-primary-foreground" />
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[hsl(16_100%_66%)] to-[hsl(48_96%_53%)] flex items-center justify-center shadow-lg shadow-[hsl(16_100%_66%)]/20">
+                  <Hash className="w-5 h-5 text-background" />
                 </div>
-                <h2 className="text-sm font-heading font-semibold text-muted-foreground uppercase tracking-wide">Hashtags</h2>
+                <h2 className="text-sm font-heading font-semibold text-muted-foreground uppercase tracking-wide">🔖 Hashtags</h2>
               </div>
               <Button
                 size="sm"
                 variant="ghost"
                 onClick={() => copyToClipboard(campaignData.hashtags, "Hashtags")}
-                className="hover:bg-primary/10"
+                className="hover:bg-[hsl(16_100%_66%)]/10"
               >
                 {copiedSection === "Hashtags" ? (
-                  <CheckCircle2 className="w-4 h-4 text-accent" />
+                  <CheckCircle2 className="w-4 h-4 text-[hsl(16_100%_66%)]" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
               </Button>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {hashtags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1.5 bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 rounded-full text-sm font-medium text-foreground hover:scale-105 transition-transform cursor-default"
-                >
-                  {tag}
-                </span>
-              ))}
+            <div className="flex flex-wrap gap-2.5">
+              {hashtags.map((tag, index) => {
+                const colors = [
+                  "from-[hsl(39_100%_58%)] to-[hsl(39_100%_48%)] shadow-[hsl(39_100%_58%)]/20",
+                  "from-[hsl(16_100%_66%)] to-[hsl(16_100%_56%)] shadow-[hsl(16_100%_66%)]/20",
+                  "from-[hsl(48_96%_53%)] to-[hsl(48_96%_43%)] shadow-[hsl(48_96%_53%)]/20",
+                  "from-[hsl(172_100%_41%)] to-[hsl(172_100%_31%)] shadow-[hsl(172_100%_41%)]/20",
+                  "from-[hsl(0_73%_67%)] to-[hsl(0_73%_57%)] shadow-[hsl(0_73%_67%)]/20",
+                ];
+                return (
+                  <span
+                    key={index}
+                    className={`px-4 py-2 bg-gradient-to-br ${colors[index % colors.length]} rounded-full text-sm font-semibold text-background hover:scale-110 transition-all duration-300 cursor-default shadow-lg hover:shadow-xl`}
+                  >
+                    {tag}
+                  </span>
+                );
+              })}
             </div>
           </Card>
 
           {/* Keywords Section */}
-          <Card className="p-6 card-lift bg-gradient-to-br from-background to-accent/5 border-accent/20 animate-fade-in delay-300">
+          <Card className="p-6 card-lift bg-gradient-to-br from-[hsl(48_96%_5%)] to-[hsl(172_100%_5%)] border-[hsl(48_96%_53%)]/30 animate-fade-in delay-300">
             <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent/80 to-primary/80 flex items-center justify-center">
-                  <Target className="w-5 h-5 text-accent-foreground" />
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[hsl(48_96%_53%)] to-[hsl(172_100%_41%)] flex items-center justify-center shadow-lg shadow-[hsl(48_96%_53%)]/20">
+                  <Target className="w-5 h-5 text-background" />
                 </div>
-                <h2 className="text-sm font-heading font-semibold text-muted-foreground uppercase tracking-wide">Keywords</h2>
+                <h2 className="text-sm font-heading font-semibold text-muted-foreground uppercase tracking-wide">🔍 Keywords</h2>
               </div>
               <Button
                 size="sm"
                 variant="ghost"
                 onClick={() => copyToClipboard(campaignData.keywords, "Keywords")}
-                className="hover:bg-accent/10"
+                className="hover:bg-[hsl(48_96%_53%)]/10"
               >
                 {copiedSection === "Keywords" ? (
-                  <CheckCircle2 className="w-4 h-4 text-accent" />
+                  <CheckCircle2 className="w-4 h-4 text-[hsl(48_96%_53%)]" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
               </Button>
             </div>
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {campaignData.keywords.split(",").map((keyword, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 text-sm font-body text-foreground/80"
+                  className="flex items-center gap-3 p-3 bg-gradient-to-r from-muted/50 to-muted/30 rounded-lg border border-[hsl(48_96%_53%)]/20 hover:scale-105 transition-transform duration-300"
                 >
-                  <div className="w-1.5 h-1.5 rounded-full bg-accent"></div>
-                  <span>{keyword.trim()}</span>
+                  <div className="w-2 h-2 rounded-full bg-gradient-to-br from-[hsl(48_96%_53%)] to-[hsl(172_100%_41%)] shadow-sm"></div>
+                  <span className="text-sm font-medium text-foreground/90">{keyword.trim()}</span>
                 </div>
               ))}
             </div>
@@ -256,30 +271,33 @@ CTA: ${campaignData.cta}
         </div>
 
         {/* CTA Section */}
-        <Card className="p-8 card-lift bg-gradient-to-r from-primary via-accent to-primary border-0 text-center animate-fade-in delay-400">
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <div className="flex items-center gap-3 mx-auto">
-              <div className="w-12 h-12 rounded-full bg-background/20 backdrop-blur-sm flex items-center justify-center">
-                <Zap className="w-6 h-6 text-primary-foreground" />
+        <Card className="p-10 card-lift bg-gradient-to-r from-[hsl(39_100%_58%)] via-[hsl(16_100%_66%)] to-[hsl(0_73%_67%)] border-0 text-center animate-fade-in delay-400 relative overflow-hidden shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+          <div className="relative">
+            <div className="flex items-center justify-between gap-4 mb-6">
+              <div className="flex items-center gap-3 mx-auto">
+                <div className="w-14 h-14 rounded-full bg-background/20 backdrop-blur-sm flex items-center justify-center shadow-xl animate-pulse">
+                  <Zap className="w-7 h-7 text-background" />
+                </div>
+                <h2 className="text-sm font-heading font-semibold text-background/90 uppercase tracking-wide">🎯 Call to Action</h2>
               </div>
-              <h2 className="text-sm font-heading font-semibold text-primary-foreground/90 uppercase tracking-wide">Call to Action</h2>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => copyToClipboard(campaignData.cta, "CTA")}
+                className="hover:bg-background/20 text-background"
+              >
+                {copiedSection === "CTA" ? (
+                  <CheckCircle2 className="w-4 h-4" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </Button>
             </div>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => copyToClipboard(campaignData.cta, "CTA")}
-              className="hover:bg-background/20 text-primary-foreground"
-            >
-              {copiedSection === "CTA" ? (
-                <CheckCircle2 className="w-4 h-4" />
-              ) : (
-                <Copy className="w-4 h-4" />
-              )}
-            </Button>
+            <p className="text-3xl md:text-5xl font-heading font-extrabold text-background drop-shadow-lg animate-pulse">
+              {campaignData.cta}
+            </p>
           </div>
-          <p className="text-3xl md:text-4xl font-heading font-bold text-primary-foreground">
-            {campaignData.cta}
-          </p>
         </Card>
 
         {/* Action Buttons */}
@@ -312,28 +330,18 @@ CTA: ${campaignData.cta}
           }
         }
         
-        .delay-100 {
-          animation-delay: 0.1s;
+        @keyframes shimmer {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
         }
         
-        .delay-200 {
-          animation-delay: 0.2s;
-        }
-        
-        .delay-300 {
-          animation-delay: 0.3s;
-        }
-        
-        .delay-400 {
-          animation-delay: 0.4s;
-        }
-        
-        .delay-500 {
-          animation-delay: 0.5s;
-        }
-        
-        .delay-1000 {
-          animation-delay: 1s;
+        .animate-shimmer {
+          background-size: 200% 200%;
+          animation: shimmer 3s ease-in-out infinite;
         }
       `}</style>
     </div>
