@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, Loader2, Link as LinkIcon } from "lucide-react";
@@ -45,10 +46,10 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
   const [loading, setLoading] = useState(false);
   const [quickMode, setQuickMode] = useState(false);
   const [scrapedData, setScrapedData] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("input");
   const { toast } = useToast();
   const autoSaveTimerRef = useRef<number | null>(null);
 
-  // Step 1 - Input (Enhanced with more fields)
   const [formData, setFormData] = useState(initialData || {
     businessDescription: "",
     targetAudience: "",
@@ -70,7 +71,6 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
     },
   });
 
-  // Step 2 - Generated variants
   const [variants, setVariants] = useState<CampaignVariant[]>([]);
   const [selectedVariant, setSelectedVariant] = useState<number | null>(null);
   const [n8nResponse, setN8nResponse] = useState<string>("");
@@ -80,14 +80,13 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
     scheduleAutoSave();
   };
 
-  // Auto-save functionality
   const scheduleAutoSave = () => {
     if (autoSaveTimerRef.current) {
       clearTimeout(autoSaveTimerRef.current);
     }
     autoSaveTimerRef.current = window.setTimeout(() => {
       saveDraft();
-    }, 30000); // Auto-save after 30 seconds of inactivity
+    }, 30000);
   };
 
   const saveDraft = async () => {
@@ -96,13 +95,11 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
       if (!user) return;
 
       if (draftId) {
-        // Update existing draft
         await supabase
           .from('drafts')
           .update({ campaign_data: formData })
           .eq('id', draftId);
       } else {
-        // Create new draft
         await supabase
           .from('drafts')
           .insert({ 
@@ -136,7 +133,6 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
       setScrapedData(data);
       setQuickMode(true);
       
-      // Auto-fill some fields from scraped data
       setFormData(prev => ({
         ...prev,
         businessDescription: prev.businessDescription || data.description || data.title,
@@ -198,7 +194,6 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
 
     setLoading(true);
     try {
-      // Send data to n8n webhook
       const n8nPayload = {
         businessDescription: formData.businessDescription,
         targetAudience: formData.targetAudience,
@@ -251,13 +246,13 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
         throw new Error(data.error);
       }
 
-      // The function returns { variants: [...] }
       if (!data?.variants || !Array.isArray(data.variants) || data.variants.length === 0) {
         console.error("Invalid data structure:", data);
         throw new Error('No campaign variants generated');
       }
 
       setVariants(data.variants);
+      setActiveTab("campaigns");
       setStep(2);
       toast({
         title: "Success! ✨",
@@ -331,8 +326,7 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8">
-        {/* Header */}
+      <Card className="w-full max-w-6xl max-h-[90vh] overflow-y-auto p-8">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <Sparkles className="w-8 h-8 text-primary animate-sparkle" />
@@ -346,24 +340,18 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
           <Button variant="ghost" onClick={onClose}>✕</Button>
         </div>
 
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex gap-2">
-            {[1, 2, 3].map((s) => (
-              <div
-                key={s}
-                className={`h-2 flex-1 rounded-full transition-colors ${
-                  s <= step ? 'bg-primary' : 'bg-muted'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger value="input">Campaign Details</TabsTrigger>
+            <TabsTrigger value="campaigns" disabled={variants.length === 0}>
+              Generated Campaigns {variants.length > 0 && `(${variants.length})`}
+            </TabsTrigger>
+            <TabsTrigger value="review" disabled={selectedVariant === null}>
+              Final Review
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Step 1: Input */}
-        {step === 1 && (
-          <div className="space-y-6 animate-fade-in">
-            {/* Show n8n response if available */}
+          <TabsContent value="input" className="space-y-6 animate-fade-in">
             {n8nResponse && (
               <div className="p-4 bg-muted rounded-lg border border-border animate-fade-in">
                 <h4 className="font-heading font-semibold mb-2">AI Campaign Strategy</h4>
@@ -436,35 +424,35 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
                 </div>
               </div>
 
-            <div>
-              <Label htmlFor="website" className="font-body font-medium">
-                Website URL *
-              </Label>
-              <div className="flex gap-2 mt-2">
-                <Input
-                  id="website"
-                  type="url"
-                  placeholder="https://example.com"
-                  value={formData.websiteUrl}
-                  onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
-                  className="flex-1"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={scrapeUrl}
-                  disabled={loading || !formData.websiteUrl}
-                >
-                  <LinkIcon className="w-4 h-4 mr-2" />
-                  Quick Scrape
-                </Button>
+              <div>
+                <Label htmlFor="website" className="font-body font-medium">
+                  Website URL *
+                </Label>
+                <div className="flex gap-2 mt-2">
+                  <Input
+                    id="website"
+                    type="url"
+                    placeholder="https://example.com"
+                    value={formData.websiteUrl}
+                    onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={scrapeUrl}
+                    disabled={loading || !formData.websiteUrl}
+                  >
+                    <LinkIcon className="w-4 h-4 mr-2" />
+                    Quick Scrape
+                  </Button>
+                </div>
+                {scrapedData && (
+                  <p className="text-xs text-green-600 mt-1">
+                    ✓ URL scraped! Generating curated campaigns...
+                  </p>
+                )}
               </div>
-              {scrapedData && (
-                <p className="text-xs text-green-600 mt-1">
-                  ✓ URL scraped! Generating curated campaigns...
-                </p>
-              )}
-            </div>
             </div>
 
             <div>
@@ -502,18 +490,15 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
                 )}
               </Button>
             </div>
-          </div>
-        )}
+          </TabsContent>
 
-        {/* Step 2: Review Variants */}
-        {step === 2 && (
-          <div className="space-y-6 animate-fade-in">
+          <TabsContent value="campaigns" className="space-y-6 animate-fade-in">
             <div className="text-center mb-6">
               <h3 className="text-xl font-heading font-bold mb-2">
                 Choose Your Campaign Variant
               </h3>
               <p className="text-muted-foreground font-body">
-                Our AI generated 3 unique campaign strategies. Select the one that best fits your goals.
+                Our AI generated {variants.length} unique campaign strategies. Select the one that best fits your goals.
               </p>
             </div>
 
@@ -524,7 +509,7 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
               </div>
             )}
 
-            <div className="space-y-4">
+            <div className="grid gap-6">
               {variants.map((variant, index) => (
                 <CampaignVariantCard
                   key={index}
@@ -539,83 +524,88 @@ export const CampaignWizard = ({ onClose, onSuccess, initialData, draftId }: Cam
             <div className="flex justify-between gap-3 pt-4">
               <Button
                 variant="outline"
-                onClick={() => setStep(1)}
-                disabled={loading}
+                onClick={() => setActiveTab("input")}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                Back to Input
               </Button>
               <Button
-                onClick={() => setStep(3)}
-                disabled={selectedVariant === null || loading}
+                onClick={() => {
+                  setStep(3);
+                  setActiveTab("review");
+                }}
+                disabled={selectedVariant === null}
                 className="btn-press bg-primary hover:bg-primary/90 text-primary-foreground"
               >
-                Review & Launch
+                Review Selected Campaign
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
-          </div>
-        )}
+          </TabsContent>
 
-        {/* Step 3: Final Review */}
-        {step === 3 && selectedVariant !== null && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="text-center mb-6">
-              <CheckCircle2 className="w-16 h-16 text-primary mx-auto mb-4" />
-              <h3 className="text-xl font-heading font-bold mb-2">
-                Ready to Launch?
-              </h3>
-              <p className="text-muted-foreground font-body">
-                Review your campaign details before saving
-              </p>
-            </div>
+          <TabsContent value="review" className="space-y-6 animate-fade-in">
+            {selectedVariant !== null && (
+              <>
+                <div className="text-center mb-6">
+                  <CheckCircle2 className="w-16 h-16 text-primary mx-auto mb-4" />
+                  <h3 className="text-xl font-heading font-bold mb-2">
+                    Ready to Launch?
+                  </h3>
+                  <p className="text-muted-foreground font-body">
+                    Review your campaign details before saving
+                  </p>
+                </div>
 
-            <CampaignVariantCard
-              variant={variants[selectedVariant]}
-              index={selectedVariant}
-              isSelected={true}
-              onSelect={() => {}}
-            />
+                <CampaignVariantCard
+                  variant={variants[selectedVariant]}
+                  index={selectedVariant}
+                  isSelected={true}
+                  onSelect={() => {}}
+                />
 
-            <div className="bg-muted p-4 rounded-lg">
-              <h4 className="font-heading font-semibold mb-2">What happens next?</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground font-body">
-                <li>✓ Campaign will be saved as a draft in your dashboard</li>
-                <li>✓ You can edit details anytime before launching</li>
-                <li>✓ Connect Google Ads to launch live campaigns</li>
-                <li>✓ Track performance in real-time</li>
-              </ul>
-            </div>
+                <div className="bg-muted p-4 rounded-lg">
+                  <h4 className="font-heading font-semibold mb-2">What happens next?</h4>
+                  <ul className="space-y-2 text-sm font-body text-muted-foreground">
+                    <li>✓ Campaign will be saved as a draft</li>
+                    <li>✓ You can review and edit before launching</li>
+                    <li>✓ Connect to Google Ads to publish</li>
+                  </ul>
+                </div>
 
-            <div className="flex justify-between gap-3 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setStep(2)}
-                disabled={loading}
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Button>
-              <Button
-                onClick={saveCampaign}
-                disabled={loading}
-                className="btn-press bg-primary hover:bg-primary/90 text-primary-foreground"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className="w-4 h-4 mr-2" />
-                    Save Campaign
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        )}
+                <div className="flex justify-between gap-3 pt-6">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setStep(2);
+                      setActiveTab("campaigns");
+                    }}
+                    disabled={loading}
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Variants
+                  </Button>
+                  <Button
+                    onClick={saveCampaign}
+                    disabled={loading}
+                    className="btn-press bg-primary hover:bg-primary/90 text-primary-foreground"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        Save Campaign
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </>
+            )}
+          </TabsContent>
+        </Tabs>
       </Card>
     </div>
   );
